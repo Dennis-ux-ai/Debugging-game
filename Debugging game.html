@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Quest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      .code-font { font-family: 'JetBrains Mono', monospace; }
+      .glow { box-shadow: 0 0 15px rgba(87, 181, 231, 0.5); }
+      .success-message { animation: fadeIn 0.3s ease-in; }
+      .error-message { animation: fadeIn 0.3s ease-in; }
+      @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#57B5E7",
+              secondary: "#1E1E1E",
+            },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-[#1E1E1E] min-h-screen text-white">
+    <header class="border-b border-gray-800 px-8 py-4">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="font-['Pacifico'] text-primary text-3xl">logo</div>
+        <div class="flex items-center gap-6">
+          <div class="text-gray-400">
+            Question <span id="currentQuestion">1</span>/10
+          </div>
+          <button
+            id="skipBtn"
+            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white !rounded-button flex items-center gap-2"
+          >
+            <i
+              class="ri-skip-forward-line w-5 h-5 flex items-center justify-center"
+            ></i>
+            Skip
+          </button>
+        </div>
+      </div>
+    </header>
+    <main class="max-w-7xl mx-auto p-8 flex gap-8">
+      <div class="w-5/12 bg-gray-900 p-6 rounded-lg glow">
+        <h2 class="text-xl font-bold mb-4">Palindrome Number</h2>
+        <div id="questionContent" class="text-gray-300 space-y-4">
+          <p>Write a function that checks if a given number is palindrome:</p>
+          <pre class="bg-gray-800 p-4 rounded code-font text-sm">
+def is_palindrome(number):
+    return str(number) == str(number)[::-1]
+# Get user input
+num = input("Enter a number: ")
+# Check if the number is a palindrome
+if is_palindrome(num):
+    print("The number is a palindrome.")
+else:
+    print("The number is not a palindrome.")</pre
+          >
+          <p>
+            Expected behavior: Function should return True for palindrome
+            numbers like 121, 1221, etc.
+          </p>
+        </div>
+      </div>
+      <div class="w-7/12 space-y-6">
+        <div class="bg-gray-900 p-6 rounded-lg">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Your Solution</h3>
+            <div class="flex gap-2">
+              <button
+                id="resetBtn"
+                class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-sm !rounded-button"
+              >
+                Reset
+              </button>
+              <button
+                id="copyBtn"
+                class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-sm !rounded-button"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+          <textarea
+            id="codeInput"
+            class="w-full h-48 bg-gray-800 p-4 rounded code-font text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            spellcheck="false"
+          ></textarea>
+        </div>
+        <div class="flex gap-4">
+          <button
+            id="runBtn"
+            class="flex-1 bg-primary hover:bg-primary/90 text-white py-3 !rounded-button flex items-center justify-center gap-2"
+          >
+            <i
+              class="ri-play-line w-5 h-5 flex items-center justify-center"
+            ></i>
+            Run Code
+          </button>
+        </div>
+        <div id="resultPanel" class="bg-gray-900 p-6 rounded-lg hidden">
+          <h3 class="text-lg font-semibold mb-4">Output</h3>
+          <div
+            id="outputContent"
+            class="bg-gray-800 p-4 rounded code-font text-sm"
+          ></div>
+        </div>
+      </div>
+    </main>
+    <div
+      id="modal"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center"
+    >
+      <div class="bg-gray-900 p-6 rounded-lg max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold mb-4">Skip Question</h3>
+        <p class="text-gray-300 mb-6">
+          Are you sure you want to skip this question? You won't be able to come
+          back.
+        </p>
+        <div class="flex gap-4">
+          <button
+            id="cancelSkip"
+            class="flex-1 bg-gray-800 hover:bg-gray-700 py-2 !rounded-button"
+          >
+            Cancel
+          </button>
+          <button
+            id="confirmSkip"
+            class="flex-1 bg-primary hover:bg-primary/90 py-2 !rounded-button"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const mockQuestions = [
+        {
+          id: 1,
+          title: "Palindrome Number",
+          description:
+            "Write a function that checks if a given number is palindrome:",
+          code: `def is_palindrome(number):
+          # Write your code here
+          pass
+      # Get user input
+      num = input("Enter a number: ")
+      # Check if the number is a palindrome
+      if is_palindrome(num):
+          print("The number is a palindrome.")
+      else:
+          print("The number is not a palindrome.")`,
+          expected:
+            "Function should return True for palindrome numbers like 121, 1221, etc.",
+        },
+        {
+          id: 2,
+          title: "Debug Challenge",
+          description:
+            "Find and fix the bug in the following code snippet that should calculate the factorial of a number:",
+          code: `function factorial(n) {
+      if (n === 0) {
+      return 0;
+      }
+      return n * factorial(n - 1);
+      }`,
+          expected: "factorial(5) should return 120",
+        },
+      ];
+      let currentQuestionIndex = 0;
+      document.getElementById("skipBtn").addEventListener("click", () => {
+        document.getElementById("modal").style.display = "flex";
+      });
+      document.getElementById("cancelSkip").addEventListener("click", () => {
+        document.getElementById("modal").style.display = "none";
+      });
+      document.getElementById("confirmSkip").addEventListener("click", () => {
+        document.getElementById("modal").style.display = "none";
+        currentQuestionIndex++;
+        document.getElementById("currentQuestion").textContent =
+          currentQuestionIndex + 1;
+        // Load next question logic here
+      });
+      document.getElementById("runBtn").addEventListener("click", () => {
+        const code = document.getElementById("codeInput").value;
+        const resultPanel = document.getElementById("resultPanel");
+        const outputContent = document.getElementById("outputContent");
+        resultPanel.classList.remove("hidden");
+        try {
+          // Test cases for palindrome
+          const testCases = ["121", "1221", "12321", "123"];
+          const results = [];
+
+          // Create a function from the code
+          const testFunction = new Function("return " + code)();
+
+          // Run test cases
+          testCases.forEach((num) => {
+            const isPalindrome = testFunction(num);
+            results.push({
+              input: num,
+              expected: num === num.split("").reverse().join(""),
+              actual: isPalindrome,
+            });
+          });
+          // Check if all test cases pass
+          const allPassed = results.every((r) => r.expected === r.actual);
+
+          if (allPassed) {
+            outputContent.innerHTML = `<div class="success-message text-green-400">
+                  <i class="ri-checkbox-circle-line w-5 h-5 flex items-center justify-center inline-block mr-2"></i>
+                  All test cases passed!<br>
+                  ${results.map((r) => `Input: ${r.input} → ${r.actual ? "Is palindrome" : "Not palindrome"}`).join("<br>")}
+              </div>`;
+          } else {
+            throw new Error("Some test cases failed. Check your implementation.");
+          }
+        } catch (error) {
+          outputContent.innerHTML = `<div class="error-message text-red-400">
+              <i class="ri-error-warning-line w-5 h-5 flex items-center justify-center inline-block mr-2"></i>
+              Error: ${error.message}
+          </div>`;
+        }
+      });
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        document.getElementById("codeInput").value =
+          mockQuestions[currentQuestionIndex].code;
+      });
+      document.getElementById("copyBtn").addEventListener("click", () => {
+        const codeInput = document.getElementById("codeInput");
+        navigator.clipboard.writeText(codeInput.value);
+      });
+      document.getElementById("codeInput").value =
+        mockQuestions[currentQuestionIndex].code;
+    </script>
+  </body>
+</html>
